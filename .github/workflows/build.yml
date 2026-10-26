@@ -22,7 +22,15 @@ jobs:
           npx cap init "Forge AI" com.forge.aicode --web-dir=www
           npx cap add android
           sed -i -e 's#<application#<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>\n    <application android:requestLegacyExternalStorage="true"#' android/app/src/main/AndroidManifest.xml
+          if [ -f forge.p12 ]; then sed -i '0,/^android {/s#^android {#android {\n    signingConfigs {\n        debug {\n            storeFile file("../../forge.p12")\n            storePassword "forge123"\n            keyAlias "forge"\n            keyPassword "forge123"\n            storeType "pkcs12"\n        }\n    }#' android/app/build.gradle; fi
           npx cap sync android
+      - name: App icon
+        if: hashFiles('icon.png') != ''
+        continue-on-error: true
+        run: |
+          mkdir -p assets && cp icon.png assets/icon-only.png && cp icon.png assets/icon-foreground.png
+          npm i -D @capacitor/assets
+          npx capacitor-assets generate --android --iconBackgroundColor '#0b0d12' --iconBackgroundColorDark '#0b0d12'
       - name: Build debug APK
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
