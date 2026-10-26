@@ -203,18 +203,26 @@ function renderEd(){const f=getF(S.open);$('#en').textContent=f?f.n:'No file ope
 function saveEd(q){const f=getF(S.open);if(!f)return toast('Open a file first.');f.c=$('#code').value;f.m=Date.now();save();renderFiles();$('#dot').hidden=true;if(q)$('#sv').textContent='Autosaved locally';else toast('Saved.','ok')}
 function pvHTML(c){return c.replace(/<link[^>]*href=["']([^"']+\.css)["'][^>]*>/g,(a,h)=>getF(h)?'<style>'+getF(h).c+'</style>':a).replace(/<script[^>]*src=["']([^"']+\.js)["'][^>]*><\/script>/g,(a,h)=>getF(h)?'<script>'+getF(h).c.replace(/<\/script/gi,'<\\/script')+'<\/script>':a)}
 /* ===== Patch / diff engine ===== */
+/* Find text even when indentation/line breaks differ; returns [start,end] or the number of matches */
+function locate(o,f){const n=o.split(f).length-1;if(n===1){const i=o.indexOf(f);return[i,i+f.length]}if(n>1)return n;
+ const t=f.trim().split(/\s+/).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));if(!t[0])return 0;
+ try{const ms=[...o.matchAll(new RegExp(t.join('\\s+'),'g'))];return ms.length===1?[ms[0].index,ms[0].index+ms[0][0].length]:ms.length}catch(e){return 0}}
+function put(o,p,a,b){const r=p.replace!==undefined?p.replace:p.content||'',t=p.type;
+ if(t==='replace')return o.slice(0,a)+r+o.slice(b);if(t==='insert_after')return o.slice(0,b)+r+o.slice(b);if(t==='insert_before')return o.slice(0,a)+r+o.slice(a);if(t==='delete')return o.slice(0,a)+o.slice(b);throw Error('Unknown operation type "'+t+'".')}
 function applyOps(src,ops){let o=src;if(!Array.isArray(ops)||!ops.length)throw Error('The AI sent no edit operations.');
- for(const p of ops){const f=p.find;if(typeof f!=='string'||!f)throw Error('An operation has no "find" text.');const n=o.split(f).length-1;
-  if(n!==1)throw Error(n?'The text to change appears '+n+' times, so the edit is ambiguous: "'+f.slice(0,50)+'".':'Could not find this text in the file: "'+f.slice(0,50)+'".');
-  const r=p.replace!==undefined?p.replace:p.content||'',t=p.type;
-  if(t==='replace')o=o.replace(f,()=>r);else if(t==='insert_after')o=o.replace(f,()=>f+r);else if(t==='insert_before')o=o.replace(f,()=>r+f);else if(t==='delete')o=o.replace(f,'');else throw Error('Unknown operation type "'+t+'".')}
+ for(const p of ops){const f=p.find;if(typeof f!=='string'||!f.trim())throw Error('An operation has no "find" text.');const L=locate(o,f);
+  if(!Array.isArray(L))throw Error(L?'The text to change appears '+L+' times, so the edit is ambiguous: "'+f.trim().slice(0,50)+'".':'Could not find this text in the file: "'+f.trim().slice(0,50)+'".');o=put(o,p,L[0],L[1])}
  return o}
-/* Loose apply ("Apply & Add"): use the anchor when it exists, otherwise insert the new code before </body> or at the end of the file */
-function applyLoose(src,ops){let o=src;if(!Array.isArray(ops))throw Error('The AI sent no edit operations.');
- for(const p of ops){const f=typeof p.find==='string'?p.find:'',r=p.replace!==undefined?p.replace:p.content||'',g=f&&o.includes(f)?f:(f.trim()&&o.includes(f.trim())?f.trim():'');
-  if(g){const t=p.type;o=o.replace(g,()=>t==='insert_after'?g+r:t==='insert_before'?r+g:t==='delete'?'':r);continue}
+/* "Apply & Add": use the anchor when found, otherwise insert new code in the right place for the file type (CSS gets a style tag, JS a script tag) */
+function wrapIns(file,r){const e=ext(file||''),t=String(r).replace(/\s+$/,''),x=t.trim();
+ if(e==='html'||e==='htm'){if(/^</.test(x))return{t,at:'body'};if(/[{][^}]*:[^}]*[}]/.test(x)&&!/\b(function|const|let|var)\b|=>/.test(x))return{t:'<style>\n'+t+'\n</style>',at:'head'};return{t:'<script>\n'+t+'\n<\/script>',at:'body'}}
+ return{t,at:'end'}}
+function applyLoose(src,ops,file){let o=src;if(!Array.isArray(ops))throw Error('The AI sent no edit operations.');
+ for(const p of ops){const f=typeof p.find==='string'?p.find:'',r=p.replace!==undefined?p.replace:p.content||'',L=f.trim()?locate(o,f):0;
+  if(Array.isArray(L)){o=put(o,p,L[0],L[1]);continue}
   if(p.type==='delete'||!String(r).trim())continue;
-  const t=String(r).replace(/\s+$/,''),i=o.search(/<\/body>/i);o=i>=0?o.slice(0,i)+t+'\n'+o.slice(i):o.replace(/\s*$/,'\n')+t+'\n'}
+  const w=wrapIns(file,r);let i=-1;if(w.at==='head')i=o.search(/<\/head>/i);if(i<0&&w.at!=='end')i=o.search(/<\/body>/i);
+  o=i>=0?o.slice(0,i)+w.t+'\n'+o.slice(i):o.replace(/\s*$/,'\n')+w.t+'\n'}
  return o}
 const L=(c,s,t)=>String(t).split('\n').map(l=>'<div class="'+c+'">'+s+' '+esc(l)+'</div>').join('');
 const diffHTML=ops=>(Array.isArray(ops)?ops:[]).map(p=>{const r=p.replace!==undefined?p.replace:p.content||'',t=p.type;return '<div class="hk">'+(t==='replace'?L('dr','-',p.find)+L('da','+',r):t==='delete'?L('dr','-',p.find):t==='insert_before'?L('da','+',r)+L('dc',' ',p.find):L('dc',' ',p.find)+L('da','+',r))+'</div>'}).join('');
@@ -229,7 +237,7 @@ function act(i,k,kind){const c=cur(),m=c.msgs[i],fs=norm(parse(m.x)[k].j);
  m.st=m.st||{};
  if(kind==='rej')m.st[k]='rejected';
  else{if(dirty())saveEd();const out=[];
-  try{for(const f of fs){if(!f.n)throw Error('The AI did not give a filename.');if(f.create)out.push({n:f.n,c:String(f.c||'')});else{const ex=getF(f.n);if(!ex)throw Error('"'+f.n+'" no longer exists.');out.push({n:f.n,c:(kind==='addapply'?applyLoose:applyOps)(ex.c,f.ops),edit:1})}}}
+  try{for(const f of fs){if(!f.n)throw Error('The AI did not give a filename.');if(f.create)out.push({n:f.n,c:String(f.c||'')});else{const ex=getF(f.n);if(!ex)throw Error('"'+f.n+'" no longer exists.');out.push({n:f.n,c:(kind==='addapply'?applyLoose(ex.c,f.ops,f.n):applyOps(ex.c,f.ops)),edit:1})}}}
   catch(e){return toast('Nothing was changed. '+e.message+' Ask the AI to try again.','err')}
   S.last=[];
   for(const o of out){const ex=getF(o.n);
