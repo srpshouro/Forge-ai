@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090b10"><title>Forge AI</title>
+<style>
+:root{--bg:#090b10;--pn:rgba(20,24,36,.78);--bd:#262c3f;--tx:#e8ebf5;--mu:#9099b0;--a:#7c9cff;--a2:#22d3ee;--a3:#a78bfa;--ok:#34d399;--bad:#f87171;--cb:#0d1017;color-scheme:dark}
+[data-theme=light]{--bg:#eef1f8;--pn:rgba(255,255,255,.85);--bd:#d5dae8;--tx:#141a2b;--mu:#566078;--a:#4a62d8;--a2:#0891b2;--a3:#7c3aed;--cb:#f6f7fb;--bad:#c42b2b;--ok:#0f8a5f;color-scheme:light}
+*{box-sizing:border-box;margin:0}html,body{height:100%}
+body{background:radial-gradient(900px 500px at 10% -10%,rgba(124,156,255,.14),transparent),radial-gradient(700px 400px at 100% 0,rgba(167,139,250,.12),transparent),var(--bg);color:var(--tx);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:rgba(127,140,170,.14);border:1px solid var(--bd);border-radius:10px;padding:6px 11px;min-height:36px;cursor:pointer;transition:.15s}
+button:hover:not(:disabled){border-color:var(--a)}button:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--a2);outline-offset:2px}
+.pri{background:linear-gradient(135deg,var(--a),var(--a3));border:0;color:#fff}
+input,select,textarea{background:var(--cb);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;min-width:0}
+header{display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--pn);backdrop-filter:blur(14px)}
+.logo{background:linear-gradient(90deg,var(--a),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap;font-size:16px}
+.ct{color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.sp{flex:1}
+.pill{font-size:12px;padding:3px 9px;border-radius:99px;border:1px solid var(--bd);white-space:nowrap}
+header .msel{max-width:160px}
+main{flex:1;display:flex;min-height:0}
+.pane{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--pn);backdrop-filter:blur(14px);overflow:hidden;position:relative}
+#files{width:260px;border-right:1px solid var(--bd);overflow-y:auto}#chat{flex:1}#ed{width:42%;border-left:1px solid var(--bd)}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:8px 10px;flex-wrap:wrap}
+.row{display:flex;gap:6px;padding:0 10px 6px}.row input{flex:1}
+ul{list-style:none;padding:0 6px}li{display:flex;align-items:center;border-radius:10px}li.on,li:hover{background:rgba(124,156,255,.14)}
+.fo{flex:1;display:flex;align-items:center;gap:8px;background:none!important;border:0;text-align:left;min-width:0}
+.fn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}small{color:var(--mu)}
+.fa button{background:none;border:0;padding:4px 6px;min-height:32px}
+.ft{font:600 9px monospace;font-style:normal;text-transform:uppercase;min-width:32px;text-align:center;padding:3px 0;border-radius:6px;background:linear-gradient(135deg,var(--a),var(--a3));color:#fff}
+.empty,.note{color:var(--mu);padding:8px 12px;font-size:12px}
+#msgs{flex:1;overflow-y:auto;padding:12px}
+.m{max-width:780px;margin:10px auto;padding:10px 14px;border-radius:14px;border:1px solid var(--bd);overflow-wrap:anywhere}
+.m.u{background:linear-gradient(135deg,rgba(124,156,255,.22),rgba(167,139,250,.16));margin-left:auto;width:fit-content}
+.mh{font-size:11px;color:var(--mu);margin-bottom:4px}
+code{font-family:ui-monospace,Consolas,monospace;background:var(--cb);padding:1px 5px;border-radius:5px}
+.cc{border:1px solid var(--bd);border-radius:12px;margin:8px 0;overflow:hidden;background:var(--cb)}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 8px;font-size:12px;color:var(--mu);border-bottom:1px solid var(--bd)}
+.cc pre{padding:10px;overflow-x:auto;font:12.5px/1.5 ui-monospace,Consolas,monospace}.cc code{padding:0;background:none}
+.hk{font:12px/1.4 ui-monospace,Consolas,monospace;padding:6px 10px;overflow-x:auto;white-space:pre-wrap;border-top:1px solid var(--bd)}
+.dr{background:rgba(248,113,113,.16)}.da{background:rgba(52,211,153,.16)}.dc{color:var(--mu)}
+.err{color:var(--bad)}.ok{color:var(--ok)}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}#chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px}
+.chip{background:rgba(34,211,238,.15);border:1px solid var(--a2);border-radius:99px;padding:2px 10px;font-size:12px}
+#chips .chip button{min-height:0;border:0;background:none;padding:0 0 0 6px}
+.cmp{display:flex;gap:8px;padding:10px 12px;align-items:flex-end}.cmp textarea{flex:1;resize:none;max-height:30vh}
+.ft2{display:flex;justify-content:space-between;padding:0 14px 6px;font-size:11px;color:var(--mu)}
+#dn{position:absolute;right:16px;bottom:120px;border-radius:99px}
+.eb{flex:1;display:flex;min-height:0;background:var(--cb)}
+#ln{padding:10px 6px;margin:0;text-align:right;color:var(--mu);overflow:hidden;user-select:none;min-width:40px}
+#code{flex:1;border:0;border-radius:0;resize:none;background:none;white-space:pre;overflow:auto;tab-size:2}
+#ln,#code{font-family:ui-monospace,Consolas,monospace;font-size:var(--fs,13px);line-height:1.5}
+.wrap #code{white-space:pre-wrap}.wrap #ln{display:none}
+#toasts{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);display:grid;gap:6px;z-index:99;width:min(92vw,420px)}
+.toast{background:var(--bg);border:1px solid var(--bd);border-left:3px solid var(--a);padding:9px 12px;border-radius:10px;box-shadow:0 8px 30px #0006;animation:in .2s}.toast.err{border-left-color:var(--bad)}.toast.ok{border-left-color:var(--ok)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}@keyframes bl{50%{opacity:.2}}
+.dots i{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:var(--a2);animation:bl 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+dialog{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:16px;padding:16px;width:min(560px,94vw);max-height:88vh;margin:auto}
+dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(3px)}
+.g{display:grid;gap:4px;margin:10px 0}.k{display:flex;gap:8px;align-items:center;margin:8px 0}.bt{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+#pk ul{max-height:50vh;overflow:auto}#pk label{display:flex;gap:8px;padding:8px;border-radius:8px}
+iframe{width:100%;height:70vh;border:1px solid var(--bd);border-radius:10px;background:#fff}
+nav{display:none}
+@media(max-width:860px){.pane{display:none;width:100%!important;border:0!important}body[data-pane=files] #files,body[data-pane=chat] #chat,body[data-pane=ed] #ed{display:flex}nav{display:flex;border-top:1px solid var(--bd);background:var(--pn);padding-bottom:env(safe-area-inset-bottom)}nav button{flex:1;border:0;border-radius:0;min-height:48px}nav button[aria-current=true]{color:var(--a2)}.logo+.ct{display:none}header .msel{max-width:110px}}
+.nomo *,.nomo *::before{transition:none!important;animation:none!important}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+header{box-shadow:0 10px 28px -20px #000}
+.logo{font-weight:700;letter-spacing:.2px}
+.m.a{background:rgba(127,140,170,.07)}
+.cmp textarea{border-radius:14px}.cmp .pri{min-height:44px;border-radius:12px;padding:0 18px;font-weight:600}
+.tb{display:flex;gap:6px;padding:0 10px 8px;overflow-x:auto;scrollbar-width:none}.tb button{white-space:nowrap;font-size:13px}.tb .pri{font-weight:600}
+li{margin:1px 0}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(127,140,170,.35);border-radius:8px}
+header{overflow:hidden}header>*{flex-shrink:0}header .ct{flex-shrink:1}
+@media(max-width:860px){header{gap:6px;padding:8px}.logo{font-size:0}.logo::before{content:'◆';font-size:20px;color:var(--a);-webkit-text-fill-color:var(--a)}.pill{font-size:11px;padding:2px 7px}header .msel{max-width:30vw;flex-shrink:1;min-width:0}header button{padding:6px 9px}}
+[hidden]{display:none!important}
+.ic{min-height:28px;padding:2px 9px;font-size:14px;margin-left:8px;vertical-align:middle}
+:root{--c1:#c792ea;--c2:#a5d6a7;--c3:#6b7394;--c4:#f78c6c;--c5:#ff7b8b;--c6:#ffcb6b;--c7:#82aaff}
+[data-theme=light]{--c1:#7c3aed;--c2:#15803d;--c3:#6b7280;--c4:#c2410c;--c5:#be123c;--c6:#a16207;--c7:#1d4ed8}
+.cw{position:relative;flex:1;min-width:0}
+#hl,#code{position:absolute;inset:0;margin:0;padding:10px 8px;border:0;border-radius:0;font-family:ui-monospace,Consolas,monospace;font-size:var(--fs,13px);line-height:1.5;tab-size:2;white-space:pre;overflow:auto}
+#hl{overflow:hidden;pointer-events:none;color:var(--tx)}#hl i{font-style:normal}#hl .t3{font-style:italic}
+#code{color:transparent;caret-color:var(--tx);background:transparent;resize:none}
+.wrap #hl{display:none}.wrap #code{color:var(--tx);white-space:pre-wrap}
+.t1{color:var(--c1)}.t2{color:var(--c2)}.t3{color:var(--c3)}.t4{color:var(--c4)}.t5{color:var(--c5)}.t6{color:var(--c6)}.t7{color:var(--c7)}
+#sg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}#sg:not(:empty){padding:6px 8px;border-top:1px solid var(--bd)}#sg button{white-space:nowrap;min-height:32px;font-size:13px}
+#fb{display:flex;gap:6px;padding:6px 8px;flex-wrap:wrap;border-top:1px solid var(--bd)}#fb input{flex:1;min-width:90px}
+#pb{cursor:pointer}.toast{white-space:pre-line}
+</style></head>
+<body data-pane="chat">
+<header><b class="logo" id="app"></b><span id="ct" class="ct"></span><span class="sp"></span><span id="st" class="pill" role="status"></span><select class="msel" aria-label="Model"></select><button id="th" aria-label="Toggle light or dark theme">◐</button><button id="nc" aria-label="New chat">＋</button><button id="gs" aria-label="Settings">⚙</button></header>
+<main>
+<section id="files" class="pane" aria-label="Workspace">
+<div class="ph"><b>Files</b><span><button id="nf" aria-label="New file">＋</button> <button id="up" aria-label="Import files">⇪</button></span></div>
+<div class="row"><input id="fq" type="search" placeholder="Search files" aria-label="Search files"><select id="so" aria-label="Sort files"><option value="name">Name<option value="type">Type<option value="date">Modified</select></div>
+<ul id="fl"></ul><div class="ph"><b>Chats</b></div><ul id="cl"></ul>
+<p class="note">Browser limit: Forge only sees files you create or import here, never other files on your device.</p>
+<input id="upi" type="file" multiple hidden><input id="imp" type="file" accept=".json" hidden>
+</section>
+<section id="chat" class="pane" aria-label="Chat">
+<div id="msgs" aria-live="polite"></div><button id="dn" hidden aria-label="Scroll to newest message">↓</button>
+<div id="chips"></div>
+<div class="cmp"><textarea id="in" rows="2" aria-label="Message" placeholder="Ask anything. Type /file to attach files. Ctrl+Enter sends."></textarea><button id="go" class="pri">Send</button><button id="stop" hidden>Stop</button></div>
+<div class="ft2"><span id="ctx"></span><span id="sv">Saved locally</span></div>
+</section>
+<section id="ed" class="pane" aria-label="Code editor">
+<div class="ph"><b id="en"></b><i id="dot" hidden class="err">● unsaved</i></div>
+<div class="tb"><button id="sa" class="pri">💾 Save</button><button id="cp">⧉ Copy code</button><button id="dw">⬇ Download</button><button id="pvb">▶ Preview</button><button id="rv">⟲ Restore</button><button id="und">↶ Undo AI edit</button><button id="fd">🔎 Find</button><button id="ft">✨ Format</button><button id="tl">☰ Tools</button><button id="fm" aria-label="Smaller font">A−</button><button id="fp" aria-label="Larger font">A+</button></div>
+<div id="fb" hidden><input id="fi" placeholder="Find" aria-label="Find"><input id="fr" placeholder="Replace" aria-label="Replace"><button id="fn1" aria-label="Next">↓</button><button id="fp1" aria-label="Previous">↑</button><button id="fr1">Replace</button><button id="fra">All</button><button id="fx" aria-label="Close find">✕</button></div>
+<div class="eb"><pre id="ln" aria-hidden="true"></pre><div class="cw"><pre id="hl" aria-hidden="true"></pre><textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Code editor"></textarea></div></div>
+<div id="sg" aria-label="Suggestions"></div>
+<div class="ft2"><span id="es"></span><span id="pb" role="button" tabindex="0" title="Show problems"></span></div>
+</section>
+</main>
+<nav aria-label="Panels"><button data-p="files">Files</button><button data-p="chat">Chat</button><button data-p="ed">Code</button></nav>
+<div id="toasts" aria-live="polite"></div>
+
+<dialog id="set" aria-label="Settings"><form method="dialog"><div class="ph"><b>Settings</b><button>Close</button></div></form>
+<label class="g">AI provider<select id="prov"></select></label>
+<label class="g" id="bw" hidden>Base URL (OpenAI-compatible, ends with /v1)<input id="base" type="text" placeholder="https://example.com/v1"></label>
+<label class="g">API key<input id="key" type="password" autocomplete="off" placeholder="Paste your key"></label>
+<div class="bt"><button id="showk" type="button">Show / hide key</button></div>
+<label class="k"><input id="sk" type="checkbox"> Save key on this device (otherwise it lives only until you close the tab)</label>
+<label class="g">Model<select class="msel"></select></label><div class="bt"><button id="rm" type="button">Refresh model list</button></div>
+<label class="g">Temperature <span id="tv"></span><input id="temp" type="range" min="0" max="2" step=".1"></label>
+<label class="g">Max output tokens<input id="maxt" type="number" min="256" max="65536"></label>
+<label class="g">Theme<select id="theme"><option value="dark">Dark<option value="light">Light</select></label>
+<label class="k"><input id="wr" type="checkbox"> Word wrap in editor</label>
+<label class="k"><input id="mo" type="checkbox"> Reduce motion</label>
+<label class="k"><input id="au" type="checkbox"> Autosave editor changes</label>
+<label class="k"><input id="aa" type="checkbox"> Send the open file with every message (so the AI always sees your latest code)</label>
+<label class="k" id="miw" hidden><input id="mi" type="checkbox"> Save all files to phone storage (Documents/ForgeAI)</label>
+<div class="bt"><button id="exp" type="button">Export workspace</button><button id="imb" type="button">Import workspace</button><button id="clr" type="button" class="err">Clear all local data</button></div>
+<p class="note">Privacy: chat messages and any files you attach are sent to the AI provider you selected, using your key. Everything else stays in this browser. Shortcuts: Ctrl/Cmd+S save, Ctrl/Cmd+P open file, Ctrl/Cmd+Enter send, Esc close.</p></dialog>
+<dialog id="pk" aria-label="Pick files"><form method="dialog"><div class="ph"><b id="pkt"></b><button id="pkd" class="pri">Done</button></div></form><input id="pkq" type="search" placeholder="Search files" aria-label="Search files" style="width:100%"><ul id="pkl"></ul></dialog>
+<dialog id="pv" aria-label="HTML preview"><form method="dialog"><div class="ph"><b>Preview (sandboxed)</b><button>Close</button></div></form><iframe sandbox="allow-scripts" title="Preview"></iframe><pre id="pvc" class="hk" aria-label="Console" style="max-height:22vh;overflow:auto;margin-top:6px"></pre></dialog>
+<dialog id="cm" aria-label="Tools"><form method="dialog"><div class="ph"><b>Tools</b><button>Close</button></div></form><input id="cmq" type="search" placeholder="Type a command" aria-label="Command" style="width:100%"><ul id="cml"></ul></dialog>
+<dialog id="wel" aria-label="Welcome"><h2>Welcome to <span class="wn"></span></h2><p style="margin:8px 0">An AI code workspace in your browser: chat with Gemini, keep files locally, and review every AI edit as a diff before it is applied.</p><form method="dialog" class="bt"><button id="wk" class="pri">Add API key</button><button>Try Demo Mode</button></form></dialog>
+
+<script>
+/* ===== Configuration ===== */
+const CFG={name:'Forge AI',ns:'forge.',models:['gemini-2.5-flash','gemini-2.0-flash','gemini-2.0-flash-lite'],ctx:100000,hist:14,maxFile:400000};
+const PROV={gemini:{n:'Google Gemini (free tier + paid)',models:CFG.models},
+openrouter:{n:'OpenRouter (free + paid models)',base:'https://openrouter.ai/api/v1',models:['meta-llama/llama-3.3-70b-instruct:free','deepseek/deepseek-chat-v3-0324:free','openai/gpt-4o-mini']},
+groq:{n:'Groq (free tier, fast)',base:'https://api.groq.com/openai/v1',models:['llama-3.3-70b-versatile','llama-3.1-8b-instant']},
+openai:{n:'OpenAI (paid)',base:'https://api.openai.com/v1',models:['gpt-4o-mini','gpt-4o']},
+mistral:{n:'Mistral (free tier + paid)',base:'https://api.mistral.ai/v1',models:['mistral-small-latest','codestral-latest']},
+deepseek:{n:'DeepSeek (paid, cheap)',base:'https://api.deepseek.com/v1',models:['deepseek-chat']},
+custom:{n:'Custom OpenAI-compatible',base:'',models:[]}};
+const FN='```',EXT={javascript:'js',typescript:'ts',python:'py',markdown:'md',bash:'sh'};
+const SYS=['You are an expert software engineer and code editor assistant. Understand the user\'s workspace and selected files. When creating a new file, return a clear filename and complete code. When editing an existing file, preserve the existing code and return targeted structured edit operations whenever possible. Never overwrite unrelated code. Explain what changed in a concise way. If the request is ambiguous, ask a clarification question. Do not claim that a change was applied until the application confirms it.',
+'OUTPUT FORMAT (the app parses it; never wrap code in JSON):',
+'New file: a short explanation, then exactly:\n@@@ CREATE filename.ext | one-line summary\n<complete raw file content, no code fence>\n@@@ END',
+'Edit an existing file (use this for any change to a file that already exists; one block per file):\n@@@ EDIT filename.ext | one-line summary\n<<<<<<< SEARCH\n<exact existing text, unique in the file>\n=======\n<replacement text>\n>>>>>>> REPLACE\n@@@ END\nUse several SEARCH/REPLACE pairs in one block if needed. SEARCH must match the file EXACTLY ONCE, so include enough surrounding lines. To insert, SEARCH an anchor line and repeat it in REPLACE with the new text added. To delete, leave REPLACE empty. Keep edits small; only resend a whole file when asked to rewrite it. Copy SEARCH text character-for-character from the CURRENT file content shown in this message and prefer short anchors (1-3 lines). Never invent text that is not in the shown file.',
+'Explanations, debugging help and questions: plain markdown. Put @@@ blocks directly in the reply, never inside a markdown code fence.','If you were not shown the current content of a file, do not guess edits and do not recreate it: ask the user to attach it with /file. Never use CREATE for a filename that already exists unless the user asked for a full rewrite.'].join('\n');
+/* ===== State + storage layer ===== */
+const $=(s,e=document)=>e.querySelector(s),$$=(s,e=document)=>[...e.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9),ext=n=>(n.match(/\.(\w+)$/)||[,''])[1].toLowerCase(),fmt=n=>n<1024?n+' B':(n/1024).toFixed(1)+' KB';
+let S;try{S=JSON.parse(localStorage.getItem(CFG.ns+'s'))}catch(e){}
+const first=!S;
+S=Object.assign({files:[],chats:[],cur:null,bak:{},open:null,last:[],set:{}},S||{});
+S.set=Object.assign({model:CFG.models[1],temp:.7,max:16384,theme:'dark',motion:false,saveKey:false,wrap:false,fs:13,auto:false,attach:true,prov:'gemini',base:'',pm:{},mirror:true},S.set);
+let KEYS=(()=>{try{const k=JSON.parse(localStorage.getItem(CFG.ns+'keys')||'null')||{},o=localStorage.getItem(CFG.ns+'key');if(o&&!k.gemini)k.gemini=o;return k}catch(e){return{}}})(),KEY=KEYS[S.set.prov]||'',ctl=null,sel=[],near=true,raf=0,pkMode='sel';
+const save=()=>{try{localStorage.setItem(CFG.ns+'s',JSON.stringify(S));$('#sv').textContent='Saved locally';mirror()}catch(e){toast('Browser storage is full. Export your workspace, then delete old files or chats.','err')}};
+function toast(t,k){const d=document.createElement('div');d.className='toast '+(k||'');d.textContent=t;$('#toasts').append(d);setTimeout(()=>d.remove(),4500)}
+/* ===== Gemini API layer ===== */
+const fe=t=>Object.assign(new Error(t),{friendly:t});
+async function gemG(contents,sys,on,sig,fin){
+ let r;try{r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(S.set.model)+':streamGenerateContent?alt=sse',{method:'POST',signal:sig,headers:{'Content-Type':'application/json','x-goog-api-key':KEY},body:JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents,generationConfig:{temperature:+S.set.temp,maxOutputTokens:+S.set.max}})})}catch(e){if(e.name==='AbortError')throw e;throw fe('Network error: Gemini could not be reached. Check your connection and try again.')}
+ if(!r.ok){let b={};try{b=await r.json()}catch(e){}const s=r.status,g=(b.error&&b.error.message)||'';
+  throw fe(s===401||s===403||(s===400&&/API key/i.test(g))?'Your Gemini API key was rejected. Open Settings and check the key.':s===429?'Rate limit or free quota reached. Wait a minute or switch to a lighter model such as gemini-2.0-flash-lite.':s===404?'The model "'+S.set.model+'" is unavailable for your key. Choose another model in Settings.':s>=500?'Gemini is temporarily unavailable. Try again shortly.':'Gemini rejected the request: '+g.slice(0,160))}
+ const rd=r.body.getReader(),dec=new TextDecoder();let buf='';rd.closed.catch(()=>{});
+ for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});const ls=buf.split('\n');buf=ls.pop();
+  for(const l of ls){if(!l.startsWith('data:'))continue;let j;try{j=JSON.parse(l.slice(5))}catch(e){continue}
+   if(j.promptFeedback&&j.promptFeedback.blockReason)throw fe('Gemini safety filters blocked this request ('+j.promptFeedback.blockReason+'). Rephrase and try again.');
+   const cd=j.candidates&&j.candidates[0];if(cd&&cd.finishReason&&fin)fin(cd.finishReason);const p=cd&&cd.content&&cd.content.parts;if(p)p.forEach(x=>x.text&&on(x.text))}}}
+async function gemO(contents,sys,on,sig,fin){const p=S.set.prov,base=(p==='custom'?(S.set.base||''):PROV[p].base).replace(/\/$/,'');if(!base)throw fe('Enter the Base URL in Settings first.');
+ const h={'Content-Type':'application/json',Authorization:'Bearer '+KEY};if(p==='openrouter'){h['X-Title']=CFG.name;if(/^https?:/.test(location.origin))h['HTTP-Referer']=location.origin}
+ let r;try{r=await fetch(base+'/chat/completions',{method:'POST',signal:sig,headers:h,body:JSON.stringify({model:S.set.model,stream:true,temperature:+S.set.temp,max_tokens:Math.min(+S.set.max,8192),messages:[{role:'system',content:sys},...contents.map(c=>({role:c.role==='model'?'assistant':'user',content:c.parts[0].text}))]})})}catch(e){if(e.name==='AbortError')throw e;throw fe('Network error: the provider could not be reached. Check your connection (some providers block browser requests).')}
+ if(!r.ok){let b={};try{b=await r.json()}catch(e){}const s=r.status,g=(b.error&&(b.error.message||b.error))||'';throw fe(s===401||s===403?'The API key was rejected by '+PROV[p].n.split(' (')[0]+'. Check it in Settings.':s===402?'This provider needs credits. Add credits or choose a free model.':s===429?'Rate limit or quota reached. Wait a minute or pick another model.':s===404?'Model "'+S.set.model+'" was not found. Pick another model in Settings.':s>=500?'The provider is temporarily unavailable. Try again shortly.':'Request rejected: '+String(g).slice(0,160))}
+ const rd=r.body.getReader(),dec=new TextDecoder();let buf='';rd.closed.catch(()=>{});
+ for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});const ls=buf.split('\n');buf=ls.pop();
+  for(let l of ls){l=l.trim();if(l.indexOf('data:')!==0)continue;l=l.slice(5).trim();if(l==='[DONE]')continue;let j;try{j=JSON.parse(l)}catch(e){continue}
+   const c=j.choices&&j.choices[0];if(!c)continue;if(c.finish_reason&&fin)fin(c.finish_reason==='length'?'MAX_TOKENS':c.finish_reason);const t=c.delta&&c.delta.content;if(t)on(t)}}}
+const gem=(...a)=>S.set.prov==='gemini'?gemG(...a):gemO(...a);
+async function loadModels(){const p=S.set.prov,pv=PROV[p];if(!KEY&&p!=='openrouter')return fillModels(pv.models);
+ try{let l;
+  if(p==='gemini'){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=100',{headers:{'x-goog-api-key':KEY}});if(!r.ok)throw 0;const j=await r.json();l=(j.models||[]).filter(m=>/gemini/.test(m.name)&&(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''))}
+  else{const b=(p==='custom'?(S.set.base||''):pv.base).replace(/\/$/,'');if(!b)throw 0;const r=await fetch(b+'/models',{headers:KEY?{Authorization:'Bearer '+KEY}:{}});if(!r.ok)throw 0;const j=await r.json();l=(j.data||[]).map(m=>m.id).filter(Boolean);if(p==='openrouter')l.sort((x,y)=>(+y.endsWith(':free'))-(+x.endsWith(':free'))||x.localeCompare(y))}
+  fillModels(l&&l.length?l:pv.models)}catch(e){fillModels(pv.models);if(KEY)toast('Could not load the live model list (check the key or Base URL). Showing defaults.')}}
+function fillModels(l){if(!l.includes(S.set.model))l=[S.set.model,...l];$$('.msel').forEach(s=>s.innerHTML=l.map(x=>'<option value="'+esc(x)+'"'+(x===S.set.model?' selected':'')+'>'+esc(x)+(/:free$/.test(x)?' · free':'')+'</option>').join(''))}
+function stat(){const s=$('#st');s.textContent=!navigator.onLine?'Offline':KEY?PROV[S.set.prov].n.split(' (')[0]+' · key set':'Demo mode';s.style.color=!navigator.onLine?'var(--bad)':KEY?'var(--ok)':'var(--a3)'}
+/* ===== File manager ===== */
+const getF=n=>S.files.find(f=>f.n===n);
+function uniq(n){if(!getF(n))return n;const m=n.match(/^(.*?)(\.[^.]*)?$/);let i=1;while(getF(m[1]+i+(m[2]||'')))i++;return m[1]+i+(m[2]||'')}
+function addFile(n,c){n=String(n||'').replace(/\\/g,'/').replace(/^\/+/,'').replace(/\.\.+\//g,'').replace(/[:*?"<>|]/g,'_').trim()||'untitled.txt';const u=uniq(n);if(u!==n)toast('"'+n+'" already exists, so it was saved as "'+u+'".');S.files.push({n:u,c,m:Date.now()});save();renderFiles();return u}
+function newFile(){const n=(prompt('File name, e.g. index.html')||'').trim();if(!n)return;if(!/^[\w.\- ]+\.\w+$/.test(n))return toast('Use a name with an extension, like app.js.','err');openF(addFile(n,tpl(n)))}
+function renF(o){const n=(prompt('Rename to:',o)||'').trim();if(!n||n===o)return;if(getF(n))return toast('A file with that name already exists.','err');getF(o).n=n;if(S.bak[o]){S.bak[n]=S.bak[o];delete S.bak[o]}if(S.open===o)S.open=n;save();renderAll()}
+function delF(n){if(!confirm('Delete '+n+'? This cannot be undone.'))return;S.files=S.files.filter(f=>f.n!==n);delete S.bak[n];if(S.open===n)S.open=null;save();renderAll()}
+const NATIVE=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+/* Phone storage (APK only): every file is mirrored to Documents/ForgeAI after each change */
+let SYNC={},mT;
+function mirror(){if(!NATIVE()||!S.set.mirror)return;clearTimeout(mT);mT=setTimeout(async()=>{const F=Capacitor.Plugins.Filesystem;for(const f of S.files){const k=f.m+':'+f.c.length;if(SYNC[f.n]===k)continue;try{await F.writeFile({path:'ForgeAI/'+f.n,data:f.c||'\n',directory:'DOCUMENTS',encoding:'utf8',recursive:true});SYNC[f.n]=k;$('#sv').textContent='Saved locally + phone'}catch(e){if(!mirror.w){mirror.w=1;toast('Could not save to phone storage. Allow file access in Android Settings > Apps > Forge AI > Permissions.','err')}break}}},400)}
+async function perm(){if(!NATIVE())return;try{const F=Capacitor.Plugins.Filesystem;let r=await F.checkPermissions();if(r.publicStorage!=='granted')r=await F.requestPermissions();S.set.mirror=r.publicStorage==='granted';save();toast(S.set.mirror?'Your files are saved to Documents/ForgeAI on this phone.':'File access was denied, so files stay inside the app. Allow it later in Android Settings.',S.set.mirror?'ok':'err')}catch(e){S.set.mirror=true}}
+async function dl(n,c,t){
+ if(NATIVE()){const P=Capacitor.Plugins,nm=n.replace(/[\\/]/g,'_');
+  try{await P.Filesystem.writeFile({path:'ForgeAI/'+nm,data:c||'\n',directory:'DOCUMENTS',encoding:'utf8',recursive:true});toast('Saved to Documents/ForgeAI/'+nm,'ok');return}catch(e){}
+  try{const r=await P.Filesystem.writeFile({path:nm,data:c||'\n',directory:'CACHE',encoding:'utf8'});await P.Share.share({title:n,url:r.uri,dialogTitle:'Save '+n})}catch(e){if(!/cancel/i.test((e&&e.message)||''))toast('Could not save the file. Use Copy code instead.','err')}return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t||'text/plain'}));a.download=n;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3e4)}
+function copyText(t){const ok=()=>toast('Copied.','ok'),fb=()=>{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.append(a);a.select();let r=false;try{r=document.execCommand('copy')}catch(e){}a.remove();r?ok():toast('Copy failed. Select the text manually.','err')};navigator.clipboard?navigator.clipboard.writeText(t).then(ok,fb):fb()}
+function renderFiles(){const q=$('#fq').value.toLowerCase(),so=$('#so').value;
+ const l=S.files.filter(f=>f.n.toLowerCase().includes(q)).sort((a,b)=>so==='date'?b.m-a.m:so==='type'?ext(a.n).localeCompare(ext(b.n))||a.n.localeCompare(b.n):a.n.localeCompare(b.n));
+ $('#fl').innerHTML=l.length?l.map(f=>'<li class="'+(f.n===S.open?'on':'')+'" data-n="'+esc(f.n)+'"><button class="fo" data-a="open"><i class="ft">'+esc(ext(f.n)||'txt')+'</i><span class="fn">'+esc(f.n)+'</span><small>'+fmt(f.c.length)+'</small></button><span class="fa"><button data-a="ren" aria-label="Rename '+esc(f.n)+'">✎</button><button data-a="dup" aria-label="Duplicate '+esc(f.n)+'">⧉</button><button data-a="dl" aria-label="Download '+esc(f.n)+'">⬇</button><button data-a="del" aria-label="Delete '+esc(f.n)+'">✕</button></span></li>').join(''):'<p class="empty">'+(S.files.length?'No files match.':'Your workspace is empty. Create a file with ＋ or import one with ⇪.')+'</p>'}
+/* ===== Editor manager ===== */
+let EDBASE='';const dirty=()=>!!getF(S.open)&&$('#code').value!==EDBASE;
+function openF(n){if(n!==S.open&&dirty()&&!confirm('Discard unsaved changes in '+S.open+'?'))return;S.open=n;save();renderFiles();renderEd();pane('ed')}
+function lnum(){const v=$('#code').value,n=v.split('\n').length;$('#ln').textContent=Array.from({length:n},(_,i)=>i+1).join('\n');$('#es').textContent=n+' lines · '+v.length+' chars';paint();clearTimeout(lT);lT=setTimeout(probs,600)}
+function renderEd(){const f=getF(S.open);$('#en').textContent=f?f.n:'No file open';$('#code').value=f?f.c:'';EDBASE=f?f.c:'';$('#code').disabled=!f;$('#code').placeholder=f?'':'Open or create a file to start editing.';lnum();$('#dot').hidden=!dirty()}
+function saveEd(q){const f=getF(S.open);if(!f)return toast('Open a file first.');f.c=$('#code').value;EDBASE=f.c;f.m=Date.now();save();renderFiles();$('#dot').hidden=true;if(q)$('#sv').textContent='Autosaved locally';else toast('Saved.','ok')}
+function pvHTML(c){return c.replace(/<link[^>]*href=["']([^"']+\.css)["'][^>]*>/g,(a,h)=>getF(h)?'<style>'+getF(h).c+'</style>':a).replace(/<script[^>]*src=["']([^"']+\.js)["'][^>]*><\/script>/g,(a,h)=>getF(h)?'<script>'+getF(h).c.replace(/<\/script/gi,'<\\/script')+'<\/script>':a)}
+/* ===== Patch / diff engine ===== */
+/* Find text even when indentation/line breaks differ; returns [start,end] or the number of matches */
+function locate(o,f){const n=o.split(f).length-1;if(n===1){const i=o.indexOf(f);return[i,i+f.length]}if(n>1)return n;
+ const t=f.trim().split(/\s+/).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));if(!t[0])return 0;
+ try{const ms=[...o.matchAll(new RegExp(t.join('\\s+'),'g'))];return ms.length===1?[ms[0].index,ms[0].index+ms[0][0].length]:ms.length}catch(e){return 0}}
+function put(o,p,a,b){const r=p.replace!==undefined?p.replace:p.content||'',t=p.type;
+ if(t==='replace')return o.slice(0,a)+r+o.slice(b);if(t==='insert_after')return o.slice(0,b)+r+o.slice(b);if(t==='insert_before')return o.slice(0,a)+r+o.slice(a);if(t==='delete')return o.slice(0,a)+o.slice(b);throw Error('Unknown operation type "'+t+'".')}
+function applyOps(src,ops){let o=src;if(!Array.isArray(ops)||!ops.length)throw Error('The AI sent no edit operations.');
+ for(const p of ops){const f=p.find;if(typeof f!=='string'||!f.trim())throw Error('An operation has no "find" text.');const L=locate(o,f);
+  if(!Array.isArray(L))throw Error(L?'The text to change appears '+L+' times, so the edit is ambiguous: "'+f.trim().slice(0,50)+'".':'Could not find this text in the file: "'+f.trim().slice(0,50)+'".');o=put(o,p,L[0],L[1])}
+ return o}
+/* "Apply & Add": use the anchor when found, otherwise insert new code in the right place for the file type (CSS gets a style tag, JS a script tag) */
+function wrapIns(file,r){const e=ext(file||''),t=String(r).replace(/\s+$/,''),x=t.trim();
+ if(e==='html'||e==='htm'){if(/^</.test(x))return{t,at:'body'};if(/[{][^}]*:[^}]*[}]/.test(x)&&!/\b(function|const|let|var)\s+[A-Za-z_$]|=>/.test(x))return{t:'<style>\n'+t+'\n</style>',at:'head'};return{t:'<script>\n'+t+'\n<\/script>',at:'body'}}
+ return{t,at:'end'}}
+function applyLoose(src,ops,file){let o=src;if(!Array.isArray(ops))throw Error('The AI sent no edit operations.');
+ for(const p of ops){const f=typeof p.find==='string'?p.find:'',r=p.replace!==undefined?p.replace:p.content||'',L=f.trim()?locate(o,f):0;
+  if(Array.isArray(L)){o=put(o,p,L[0],L[1]);continue}
+  if(p.type==='delete'||!String(r).trim())continue;
+  const w=wrapIns(file,r);let i=-1;if(w.at==='head')i=o.search(/<\/head>/i);if(i<0&&w.at!=='end')i=o.search(/<\/body>/i);
+  o=i>=0?o.slice(0,i)+w.t+'\n'+o.slice(i):o.replace(/\s*$/,'\n')+w.t+'\n'}
+ return o}
+const L=(c,s,t)=>String(t).split('\n').map(l=>'<div class="'+c+'">'+s+' '+esc(l)+'</div>').join('');
+const diffHTML=ops=>(Array.isArray(ops)?ops:[]).map(p=>{const r=p.replace!==undefined?p.replace:p.content||'',t=p.type;return '<div class="hk">'+(t==='replace'?L('dr','-',p.find)+L('da','+',r):t==='delete'?L('dr','-',p.find):t==='insert_before'?L('da','+',r)+L('dc',' ',p.find):L('dc',' ',p.find)+L('da','+',r))+'</div>'}).join('');
+function backup(n){const f=getF(n);(S.bak[n]=S.bak[n]||[]).push({c:f.c,t:Date.now()});S.bak[n]=S.bak[n].slice(-10)}
+function restoreV(){const n=S.open,b=S.bak[n]||[];if(!n||!b.length)return toast('No earlier versions yet. A version is saved before every AI change.');
+ const t=prompt('Restore which version of '+n+'?\n'+b.map((x,i)=>(i+1)+') '+new Date(x.t).toLocaleString()+' · '+fmt(x.c.length)).join('\n')+'\nType a number:',String(b.length)),x=b[(+t)-1];if(!x)return;
+ backup(n);const f=getF(n);f.c=x.c;f.m=Date.now();save();renderAll();renderEd();toast('Version restored.','ok')}
+function undo(){if(!S.last.length)return toast('Nothing to undo.');S.last.forEach(n=>{const f=getF(n),b=(S.bak[n]||[]).pop();if(f&&b){f.c=b.c;f.m=Date.now()}});const ch=S.last.includes(S.open);S.last=[];save();renderAll();if(ch)renderEd();toast('Last AI change undone.','ok')}
+const norm=j=>j.action==='create_file'?[{n:j.filename,c:j.content,s:j.summary,create:1}]:j.action==='edit_file'?[{n:j.filename,ops:j.operations,s:j.summary}]:j.action==='multi_file_edit'?(Array.isArray(j.files)?j.files:[]).map(f=>({n:f.filename,ops:f.operations,s:f.summary})):[];
+function act(i,k,kind){const c=cur(),m=c.msgs[i],fs=norm(parse(m.x)[k].j);
+ if(kind==='patch'){copyText(JSON.stringify(parse(m.x)[k].j,null,2));return}
+ m.st=m.st||{};
+ if(kind==='rej')m.st[k]='rejected';
+ else{if(dirty())saveEd();const out=[];
+  try{for(const f of fs){if(!f.n)throw Error('The AI did not give a filename.');if(f.create)out.push({n:f.n,c:String(f.c||'')});else{const ex=getF(f.n);if(!ex)throw Error('"'+f.n+'" no longer exists.');out.push({n:f.n,c:(kind==='addapply'?applyLoose(ex.c,f.ops,f.n):applyOps(ex.c,f.ops)),edit:1})}}}
+  catch(e){return toast('Nothing was changed. '+e.message+' Ask the AI to try again.','err')}
+  for(const o of out){const ex=getF(o.n);if(ex&&o.edit&&o.c.length<ex.c.length*.6&&!confirm('This change would shrink '+o.n+' from '+fmt(ex.c.length)+' to '+fmt(o.c.length)+', removing a lot of your code.\nOK = apply anyway (Restore or Undo brings it back).\nCancel = change nothing.'))return toast('Nothing was changed.')}
+  S.last=[];
+  for(const o of out){const ex=getF(o.n);
+   if(ex){if(!o.edit&&!confirm(o.n+' already exists ('+fmt(ex.c.length)+'). The new content is '+fmt(o.c.length)+(o.c.length<ex.c.length*.6?' - MUCH SMALLER, most of your code would be lost!':'')+'.\nOK = replace the file (a backup is kept, Restore or Undo brings it back).\nCancel = save as a separate copy.')){addFile(o.n,o.c);continue}backup(o.n);ex.c=o.c;ex.m=Date.now();S.last.push(o.n)}else addFile(o.n,o.c)}
+  m.st[k]='applied';toast('Changes applied. Use Undo to revert.','ok')}
+ save();renderAll()}
+/* ===== Chat manager ===== */
+const cur=()=>S.chats.find(c=>c.id===S.cur);
+function newChat(){const c={id:uid(),t:'New chat',msgs:[]};S.chats.unshift(c);S.cur=c.id;sel=[];save();renderAll()}
+function fences(text){const parts=[],re=/^```(\w*)[^\n]*\n([\s\S]*?)(?:^```[ \t\r]*$|(?![\s\S]))/gm;let i=0,m;
+ while(m=re.exec(text)){if(m.index>i)parts.push({t:'md',s:text.slice(i,m.index)});let j=null;
+  if(m[1]==='json'||/^\s*\{\s*"action"/.test(m[2])){try{j=JSON.parse(m[2])}catch(e){}}
+  parts.push(j&&j.action?{t:'act',j}:m[1]==='json'&&/"action"/.test(m[2])?{t:'bad'}:{t:'code',l:m[1],s:m[2].replace(/\n$/,'')});i=re.lastIndex}
+ if(i<text.length)parts.push({t:'md',s:text.slice(i)});return parts}
+function blk(m){const kind=m[1],fn=(m[2]||'').trim(),sum=(m[3]||'').trim(),body=m[4]||'',done=/^@@@ END[ \t]*$/.test(m[0].slice(m[0].lastIndexOf('\n')+1));
+ if(!done)return{t:'part',n:fn};
+ if(kind==='CREATE')return{t:'act',j:{action:'create_file',filename:fn,summary:sum,content:body.replace(/^\s*```\w*\n/,'').replace(/\n```\s*$/,'').replace(/\n$/,'')}};
+ const ops=[],re=/<<<<<<< SEARCH\n([\s\S]*?)\n=======\n([\s\S]*?)>>>>>>> REPLACE/g;let x;while(x=re.exec(body))ops.push({type:'replace',find:x[1],replace:x[2].replace(/\n$/,'')});
+ return ops.length?{t:'act',j:{action:'edit_file',filename:fn,summary:sum,operations:ops}}:{t:'bad'}}
+function parse(text){const out=[],re=/^@@@ (CREATE|EDIT) ([^\n|]+?)[ \t]*(?:\|[ \t]*([^\n]*))?\n([\s\S]*?)(?:^@@@ END[ \t]*$|(?![\s\S]))/gm;let i=0,m;
+ while(m=re.exec(text)){if(m.index>i)out.push(...fences(text.slice(i,m.index)));out.push(blk(m));i=re.lastIndex}
+ if(i<text.length)out.push(...fences(text.slice(i)));return out}
+const md=s=>esc(s).replace(/^#{1,3} (.*)$/gm,'<b>$1</b>').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/^[-*] (.*)$/gm,'• $1').replace(/\n/g,'<br>');
+function actCard(j,m,i,k){const fs=norm(j),s=m.st&&m.st[k];let bad='';
+ const body=fs.map(f=>{if(f.create)return '<div class="hk"><b>＋ New file '+esc(f.n)+'</b> ('+fmt(String(f.c||'').length)+')'+(getF(f.n)?' <span class="err">⚠ replaces your existing '+fmt(getF(f.n).c.length)+' file</span>':'')+' '+esc(f.s||'')+'</div>'+(s?'':'<div class="hk">'+esc(String(f.c||'').split('\n').slice(0,12).join('\n'))+'</div>');
+  try{if(!s){const ex=getF(f.n);if(!ex)throw Error('"'+f.n+'" no longer exists.');applyOps(ex.c,f.ops)}}catch(e){bad=e.message}
+  return '<div class="hk"><b>✎ '+esc(f.n)+'</b> '+esc(f.s||'')+'</div>'+diffHTML(f.ops)}).join('');
+ return '<div class="cc"><div class="ch"><span>'+esc(j.action.replace(/_/g,' '))+'</span>'+(s?'<b class="'+(s==='applied'?'ok':'')+'">'+s+'</b>':'')+'</div>'+body+(bad?'<div class="hk err">Cannot apply safely: '+esc(bad)+' Nothing was changed. Press Apply &amp; Add to insert the new code anyway (before &lt;/body&gt; or at the end of the file), or ask the AI to resend the edit.</div>':'')+
+ '<div class="ch">'+(s?(s==='applied'?'<button data-a="undo">Undo last change</button>':''):'<button class="pri" data-a="apply" data-k="'+k+'"'+(bad?' disabled':'')+'>Apply Changes</button>'+(bad?'<button class="pri" data-a="addapply" data-k="'+k+'">Apply &amp; Add</button>':'')+'<button data-a="rej" data-k="'+k+'">Reject Changes</button><button data-a="patch" data-k="'+k+'">Copy Patch</button>')+'</div></div>'}
+function msgHTML(m,i,st,c){const u=m.r==='user';let h='';
+ if(u)h=md(m.x)+(m.files&&m.files.length?'<div class="chips">'+m.files.map(f=>'<span class="chip">'+esc(f)+'</span>').join('')+'</div>':'');
+ else if(st&&!m.x)h='<span class="dots"><i></i><i></i><i></i></span>';
+ else h=parse(m.x).map((p,k)=>p.t==='md'?'<div>'+md(p.s)+'</div>':p.t==='code'?'<div class="cc"><div class="ch"><span>'+esc(p.l||'code')+'</span><span><button data-a="copy" data-k="'+k+'">Copy</button> <button data-a="saveas" data-k="'+k+'">Save to workspace</button></span></div><pre><code>'+esc(p.s)+'</code></pre></div>':p.t==='bad'?'<div class="err">'+(st?'Receiving edit…':'The AI sent malformed edit data (it was not cut off). Press Regenerate.')+'</div>':p.t==='part'?'<div class="err">'+(st?'Receiving '+esc(p.n||'edit')+'…':'Output was cut off before '+esc(p.n||'the edit')+' was finished. Press Continue to receive the rest.')+'</div>':actCard(p.j,m,i,k)).join('');
+ return '<div class="mh">'+(u?'You':esc(CFG.name))+(m.demo?' · DEMO MODE':'')+' · '+new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+(u?' <button class="ic" data-a="cpm" title="Copy prompt" aria-label="Copy prompt">⧉</button>':'')+'</div>'+h+(!u&&!st&&i===c.msgs.length-1?'<div class="bt">'+(cut(m)?'<button class="pri" data-a="cont">Continue where it stopped</button>':'')+'<button data-a="'+(m.err?'retry':'regen')+'">↻ '+(m.err?'Retry':'Regenerate')+'</button></div>':'')}
+const EMPTY='<div class="m"><b>What do you want to build?</b><div class="bt" style="flex-direction:column;align-items:flex-start">'+['Create a responsive portfolio website.','Create a file named solar.html.','Analyze my selected file and improve its mobile responsiveness.','Add dark mode to this file.','Fix the errors in this code.','Explain this file step by step.'].map(t=>'<button data-a="ex">'+t+'</button>').join('')+'</div></div>';
+function renderChat(){const c=cur();$('#ct').textContent=c.t;$('#msgs').innerHTML=c.msgs.length?c.msgs.map((m,i)=>'<article class="m '+(m.r==='user'?'u':'a')+'" data-i="'+i+'">'+msgHTML(m,i,!!ctl&&i===c.msgs.length-1,c)+'</article>').join(''):EMPTY;if(near)$('#msgs').scrollTop=1e9;ctxUI();renderCL()}
+function live(m){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;const c=cur(),i=c.msgs.indexOf(m),el=$('#msgs').children[i];if(el){el.innerHTML=msgHTML(m,i,true,c);if(near)$('#msgs').scrollTop=1e9}})}
+function renderCL(){$('#cl').innerHTML=S.chats.map(c=>'<li class="'+(c.id===S.cur?'on':'')+'" data-id="'+c.id+'"><button class="fo" data-a="sw"><span class="fn">'+esc(c.t)+'</span></button><span class="fa"><button data-a="rn" aria-label="Rename chat">✎</button><button data-a="dc" aria-label="Delete chat">✕</button></span></li>').join('')}
+function ctxUI(){const n=cur().msgs.reduce((a,m)=>a+m.x.length+(m.ctx||'').length,0)+$('#in').value.length+sel.reduce((a,n)=>a+(getF(n)?Math.min(getF(n).c.length,CFG.ctx):0),0);$('#ctx').textContent='≈'+Math.round(n/4)+' tokens in context'}
+function chipsUI(){$('#chips').innerHTML=sel.map(n=>'<span class="chip">'+esc(n)+'<button data-n="'+esc(n)+'" aria-label="Remove '+esc(n)+'">✕</button></span>').join('');ctxUI()}
+function busy(b){$('#go').hidden=b;$('#stop').hidden=!b}
+/* Truncation handling: Continue resumes a reply that was cut off by the output token limit */
+const cut=m=>!!m.trunc||(m.x.match(/^```/gm)||[]).length%2===1||(m.x.match(/^@@@ (CREATE|EDIT) /gm)||[]).length>(m.x.match(/^@@@ END[ \t]*$/gm)||[]).length;
+const CONT='Your previous response was cut off by the output token limit. Continue EXACTLY where it stopped: output only the remaining text, starting at the very next character. Do not repeat anything, do not restart, and do not open a new code fence if you were inside one, and do not repeat any @@@ header line.';
+function dedupe(base,add){const odd=(base.match(/^```/gm)||[]).length%2===1,f=odd?add.replace(/^\s*```\w*\n/,''):add;for(let n=Math.min(300,base.length,f.length);n>=8;n--)if(base.endsWith(f.slice(0,n)))return f.slice(n);return f}
+async function cont(){if(ctl)return;const c=cur(),m=c.msgs[c.msgs.length-1];if(!m||m.r!=='ai')return;
+ if(!KEY)return toast('Continue needs a Gemini API key. Add one in Settings.','err');
+ const base=m.x;let add='';m.trunc=0;ctl=new AbortController();near=true;busy(true);renderChat();
+ const contents=c.msgs.filter(x=>!x.err&&x.x).slice(-CFG.hist).map((x,i,a)=>({role:x.r==='user'?'user':'model',parts:[{text:ctxT(x,a).slice(0,CFG.ctx*3)}]}));
+ while(contents[0]&&contents[0].role==='model')contents.shift();
+ contents.push({role:'user',parts:[{text:CONT}]});
+ try{await gem(contents,SYS+'\nWorkspace files: '+(S.files.map(f=>f.n).join(', ')||'(none)')+'.',t=>{add+=t;m.x=base+dedupe(base,add);live(m)},ctl.signal,r=>{if(r==='MAX_TOKENS')m.trunc=1})}
+ catch(e){m.trunc=1;if(e.name!=='AbortError')toast(e.friendly||'Continue failed: '+e.message,'err')}
+ ctl=null;busy(false);save();renderChat()}
+function helpMsg(){const c=cur();c.msgs.push({r:'ai',ts:Date.now(),x:'**Commands**\n- `/file` attach workspace files\n- `/new` new chat · `/clear` clear chat · `/open` open editor · `/save` save file · `/model` settings · `/help` this list\n\n**Shortcuts**: Ctrl/Cmd+S save, Ctrl/Cmd+P open file, Ctrl/Cmd+Enter send, Esc close.'});save();renderChat()}
+function cmd(t){const c=t.split(/\s+/)[0];if(c==='/new')newChat();else if(c==='/clear'){if(confirm('Clear this chat?')){cur().msgs=[];save();renderChat()}}else if(c==='/open')pane('ed');else if(c==='/save')saveEd();else if(c==='/model')$('#set').showModal();else if(c==='/help')helpMsg();else return false;$('#in').value='';return true}
+async function demo(c,m){const u=c.msgs[c.msgs.length-2],t=u.x,f=u.files&&u.files[0]?getF(u.files[0]):null;m.demo=1;
+ let r='**Demo Mode: this is a canned response, not Gemini.** Add an API key in Settings for real answers.\n\n';const nm=(t.match(/named?\s+([\w.\-]+\.\w+)/i)||[])[1];
+ if(nm||/create/i.test(t)){const n=nm||'demo.html';r+='Here is a sample proposal for **'+n+'**:\n\n'+FN+'json\n'+JSON.stringify({action:'create_file',filename:n,summary:'Demo starter file.',content:'<!DOCTYPE html>\n<title>Demo</title>\n<h1>Hello from demo mode</h1>\n'})+'\n'+FN}
+ else if(f&&f.c.trim()){const e=ext(f.n),mk=e==='html'?'<!-- demo edit -->\n':e==='css'?'/* demo edit */\n':'// demo edit\n',first=f.c.split('\n')[0];r+='A harmless demo of targeted editing: add a marker comment to the top of **'+f.n+'**.\n\n'+FN+'json\n'+JSON.stringify({action:'edit_file',filename:f.n,summary:'Add a demo comment.',operations:[{type:'insert_before',find:first,content:mk}]})+'\n'+FN}
+ else r+='Try `/file` to attach a file, or ask me to "create a file named solar.html".';
+ for(let i=0;i<r.length;i+=14){if(ctl.signal.aborted)throw new DOMException('','AbortError');m.x=r.slice(0,i+14);live(m);await new Promise(z=>setTimeout(z,15))}m.x=r}
+function fileCtx(names){let x='';names.map(getF).filter(Boolean).forEach(f=>{x+='\n--- FILE: '+f.n+' (type '+(ext(f.n)||'text')+', CURRENT content, modified '+new Date(f.m).toISOString()+') ---\n'+f.c.slice(0,CFG.ctx)+(f.c.length>CFG.ctx?'\n[truncated]':'')+'\n--- END FILE ---\n'});return x}
+const ctxT=(x,h)=>{if(x.r!=='user'||!(x.files&&x.files.length))return x.x;const lu=[...h].reverse().find(y=>y.r==='user');return x===lu?x.x+'\n'+fileCtx(x.files):x.x};
+async function send(txt,regen){txt=(txt||'').trim();if(ctl)return;if(!regen){if(!txt)return toast('Type a message first.','err');if(txt[0]==='/'&&cmd(txt))return}
+ const c=cur();
+ if(!regen){if(/\/file\b/.test(txt))S.files.forEach(f=>{if(txt.includes(f.n)&&!sel.includes(f.n))sel.push(f.n)});
+  if(dirty())saveEd(1);if(!sel.length&&S.set.attach&&getF(S.open))sel.push(S.open);const fl=sel.map(getF).filter(Boolean);let x='';
+  fl.forEach(f=>{if(!f.c.trim())toast(f.n+' is empty.');if(f.c.length>CFG.ctx)toast(f.n+' is large; only the first '+CFG.ctx/1000+'K characters are sent.');x+='\n--- FILE: '+f.n+' (type '+(ext(f.n)||'text')+', modified '+new Date(f.m).toISOString()+') ---\n'+f.c.slice(0,CFG.ctx)+(f.c.length>CFG.ctx?'\n[truncated]':'')+'\n--- END FILE ---\n'});
+  c.msgs.push({r:'user',x:txt.replace(/\/file\b/g,'').replace(/\s+/g,' ').trim()||txt,ts:Date.now(),files:fl.map(f=>f.n)});
+  if(c.t==='New chat')c.t=c.msgs[c.msgs.length-1].x.slice(0,40)||'New chat';
+  sel=[];$('#in').value='';chipsUI()}
+ const m={r:'ai',x:'',ts:Date.now()};c.msgs.push(m);ctl=new AbortController();near=true;busy(true);renderChat();
+ try{if(!KEY)await demo(c,m);else{
+   const h=c.msgs.slice(0,-1).filter(x=>!x.err&&x.x).slice(-CFG.hist),n=h.length;
+   const contents=h.map((x,i)=>({role:x.r==='user'?'user':'model',parts:[{text:ctxT(x,h).slice(0,CFG.ctx*3)}]}));
+   while(contents[0]&&contents[0].role==='model')contents.shift();
+   await gem(contents,SYS+'\nWorkspace files: '+(S.files.map(f=>f.n).join(', ')||'(none)')+'.',t=>{m.x+=t;live(m)},ctl.signal,r=>{if(r==='MAX_TOKENS')m.trunc=1})}
+  if(!m.x.trim()){m.x='The model returned an empty response. Try again or choose another model.';m.err=1}}
+ catch(e){if(e.name==='AbortError')m.x+=(m.x?'\n\n':'')+'*(stopped)*';else{m.x+=(m.x?'\n\n':'')+'⚠️ '+(e.friendly||'Unexpected error: '+e.message);m.err=1}}
+ ctl=null;busy(false);save();renderChat()}
+/* ===== UI rendering + event handlers ===== */
+function pane(p){document.body.dataset.pane=p;$$('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.p===p))}
+function prefs(){document.documentElement.dataset.theme=S.set.theme;document.documentElement.classList.toggle('nomo',!!S.set.motion);$('.eb').classList.toggle('wrap',!!S.set.wrap);document.documentElement.style.setProperty('--fs',S.set.fs+'px');$('#app').textContent='◆ '+CFG.name;$$('.wn').forEach(e=>e.textContent=CFG.name);document.title=CFG.name;stat()}
+function renderAll(){renderFiles();renderChat();if(dirty())$('#en').textContent=S.open;else renderEd();chipsUI();prefs()}
+function openPk(mode){pkMode=mode;$('#pkt').textContent=mode==='sel'?'Attach files':'Open file';$('#pkq').value='';pkList();$('#pk').showModal();$('#pkq').focus()}
+function pkList(){const q=$('#pkq').value.toLowerCase(),l=S.files.filter(f=>f.n.toLowerCase().includes(q));$('#pkl').innerHTML=l.length?l.map(f=>'<li><label><input type="'+(pkMode==='sel'?'checkbox':'radio')+'" name="pf" value="'+esc(f.n)+'"'+(sel.includes(f.n)&&pkMode==='sel'?' checked':'')+'> '+esc(f.n)+' <small>'+fmt(f.c.length)+'</small></label></li>').join(''):'<p class="empty">No files found.</p>'}
+function setKey(v){KEY=v.trim();if(KEY)KEYS[S.set.prov]=KEY;else delete KEYS[S.set.prov];try{if(S.set.saveKey&&Object.keys(KEYS).length)localStorage.setItem(CFG.ns+'keys',JSON.stringify(KEYS));else localStorage.removeItem(CFG.ns+'keys');localStorage.removeItem(CFG.ns+'key')}catch(e){}stat();loadModels()}
+function importWs(t){try{const j=JSON.parse(t);if(!Array.isArray(j.files)||!Array.isArray(j.chats))throw 0;if(!confirm('Replace the current workspace with this file?'))return;S.files=j.files;S.chats=j.chats;S.bak=j.bak||{};S.cur=j.chats[0]&&j.chats[0].id;S.open=null;if(!S.chats.length)newChat();save();renderAll();toast('Workspace imported.','ok')}catch(e){toast('That file is not a valid Forge workspace export.','err')}}
+$('#fl').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const n=b.closest('li').dataset.n,a=b.dataset.a;if(a==='open')openF(n);else if(a==='ren')renF(n);else if(a==='dup')addFile(n.replace(/(\.\w+)?$/,'-copy$1'),getF(n).c);else if(a==='dl')dl(n,getF(n).c);else if(a==='del')delF(n)};
+$('#cl').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const id=b.closest('li').dataset.id,c=S.chats.find(x=>x.id===id),a=b.dataset.a;
+ if(a==='sw'){S.cur=id;sel=[];save();renderAll()}else if(a==='rn'){const t=(prompt('Chat name:',c.t)||'').trim();if(t){c.t=t;save();renderChat()}}
+ else if(confirm('Delete chat "'+c.t+'"?')){S.chats=S.chats.filter(x=>x!==c);if(!S.chats.length)newChat();else{if(S.cur===id)S.cur=S.chats[0].id;save();renderAll()}}};
+$('#msgs').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,c=cur(),art=b.closest('[data-i]'),i=art?+art.dataset.i:0,k=+b.dataset.k;
+ if(a==='cpm')copyText(c.msgs[i].x);
+ else if(a==='ex'){$('#in').value=b.textContent;$('#in').focus()}
+ else if(a==='regen'||a==='retry'){while(c.msgs.length&&c.msgs[c.msgs.length-1].r!=='user')c.msgs.pop();send('',1)}
+ else if(a==='copy')copyText(parse(c.msgs[i].x)[k].s);
+ else if(a==='saveas'){const p=parse(c.msgs[i].x)[k],n=(prompt('Save as file name:','snippet.'+(EXT[p.l]||p.l||'txt'))||'').trim();if(n)openF(addFile(n,p.s))}
+ else if(a==='undo')undo();else if(a==='cont')cont();else act(i,k,a)};
+$('#msgs').onscroll=e=>{const m=e.target;near=m.scrollHeight-m.scrollTop-m.clientHeight<150;$('#dn').hidden=near};
+$('#dn').onclick=()=>{near=true;$('#msgs').scrollTop=1e9};
+$('#go').onclick=()=>send($('#in').value);$('#stop').onclick=()=>{try{ctl&&ctl.abort()}catch(e){}};
+$('#in').oninput=e=>{if(/(^|\s)\/file$/.test(e.target.value))openPk('sel');ctxUI()};
+$('#in').onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();send($('#in').value)}};
+$('#chips').onclick=e=>{const b=e.target.closest('button');if(b){sel=sel.filter(n=>n!==b.dataset.n);chipsUI()}};
+$('#pkq').oninput=pkList;
+$('#pkl').onchange=e=>{if(pkMode==='open'){$('#pk').close();openF(e.target.value)}};
+$('#pk').onclose=()=>{if(pkMode==='sel'){const vis=$$('#pkl input').map(x=>x.value);sel=sel.filter(n=>!vis.includes(n)).concat($$('#pkl input:checked').map(x=>x.value));const v=$('#in').value;if(sel.length)$('#in').value=v.replace(/(^|\s)\/file$/,'$1')+sel.join(' ')+' ';else $('#in').value=v.replace(/(^|\s)\/file$/,'$1');chipsUI();$('#in').focus()}};
+$('#nf').onclick=newFile;$('#up').onclick=()=>$('#upi').click();$('#nc').onclick=()=>{newChat();pane('chat')};
+$('#upi').onchange=async e=>{for(const f of e.target.files){if(f.size>CFG.maxFile){toast(f.name+' is too large (max '+fmt(CFG.maxFile)+').','err');continue}addFile(f.name,await f.text())}e.target.value=''};
+$('#fq').oninput=$('#so').onchange=renderFiles;
+let aT;
+
+$('#sa').onclick=()=>saveEd();$('#und').onclick=undo;$('#rv').onclick=restoreV;
+$('#cp').onclick=()=>{if(!getF(S.open))return toast('Open a file first.');if(!$('#code').value)return toast('This file is empty.');copyText($('#code').value)};
+$('#dw').onclick=()=>{const f=getF(S.open);if(!f)return toast('Open a file first.');dl(f.n,$('#code').value);NATIVE()||toast('Downloading '+f.n+'. Check your Downloads folder.','ok')};
+$('#pvb').onclick=()=>{const f=getF(S.open);if(!f)return toast('Open a file first.');if(!/^(html?|svg)$/.test(ext(f.n)))return toast('Preview works for HTML and SVG files.');$('#pvc').textContent='';$('#pv iframe').srcdoc=injC(pvHTML($('#code').value));$('#pv').showModal()};
+$('#fm').onclick=()=>{S.set.fs=Math.max(10,S.set.fs-1);prefs();save()};$('#fp').onclick=()=>{S.set.fs=Math.min(24,S.set.fs+1);prefs();save()};
+$('#th').onclick=()=>{S.set.theme=S.set.theme==='dark'?'light':'dark';$('#theme').value=S.set.theme;prefs();save()};
+$$('nav button').forEach(b=>b.onclick=()=>pane(b.dataset.p));
+$('#gs').onclick=()=>{$('#prov').value=S.set.prov;$('#base').value=S.set.base||'';$('#bw').hidden=S.set.prov!=='custom';$('#key').value=KEY;$('#sk').checked=S.set.saveKey;$('#temp').value=S.set.temp;$('#tv').textContent=S.set.temp;$('#maxt').value=S.set.max;$('#theme').value=S.set.theme;$('#wr').checked=S.set.wrap;$('#mo').checked=S.set.motion;$('#au').checked=S.set.auto;$('#aa').checked=!!S.set.attach;$('#miw').hidden=!NATIVE();$('#mi').checked=!!S.set.mirror;$('#set').showModal()};
+$('#key').onchange=e=>setKey(e.target.value);$('#showk').onclick=()=>{const k=$('#key');k.type=k.type==='password'?'text':'password'};
+$('#sk').onchange=e=>{S.set.saveKey=e.target.checked;setKey($('#key').value);save()};$('#rm').onclick=()=>{setKey($('#key').value);toast(KEY?'Refreshing models…':'Add a key to load the live model list.')};
+$$('.msel').forEach(s=>s.onchange=e=>{S.set.model=e.target.value;S.set.pm[S.set.prov]=S.set.model;$$('.msel').forEach(x=>x.value=S.set.model);save()});
+$('#temp').oninput=e=>{S.set.temp=+e.target.value;$('#tv').textContent=e.target.value;save()};
+$('#maxt').onchange=e=>{S.set.max=Math.min(65536,Math.max(256,+e.target.value||8192));save()};
+$('#theme').onchange=e=>{S.set.theme=e.target.value;prefs();save()};$('#wr').onchange=e=>{S.set.wrap=e.target.checked;prefs();save()};$('#mo').onchange=e=>{S.set.motion=e.target.checked;prefs();save()};$('#au').onchange=e=>{S.set.auto=e.target.checked;save()};$('#aa').onchange=e=>{S.set.attach=e.target.checked;save()};
+$('#prov').onchange=e=>{S.set.prov=e.target.value;const pv=PROV[S.set.prov];S.set.model=S.set.pm[S.set.prov]||pv.models[0]||'';KEY=KEYS[S.set.prov]||'';$('#key').value=KEY;$('#bw').hidden=S.set.prov!=='custom';fillModels(pv.models);stat();save();loadModels()};
+$('#base').onchange=e=>{S.set.base=e.target.value.trim();save();loadModels()};
+$('#mi').onchange=e=>{S.set.mirror=e.target.checked;save();if(e.target.checked)perm()};
+$('#set').onclose=()=>{if($('#key').value.trim()!==KEY)setKey($('#key').value)};
+$('#exp').onclick=()=>{dl('forge-workspace.json',JSON.stringify({v:1,files:S.files,chats:S.chats,bak:S.bak}),'application/json');toast('Exported. Your API key is never included.','ok')};
+$('#imb').onclick=()=>$('#imp').click();$('#imp').onchange=async e=>{if(e.target.files[0])importWs(await e.target.files[0].text());e.target.value=''};
+$('#clr').onclick=()=>{if(confirm('Delete ALL files, chats, backups, settings and the saved key from this browser? This cannot be undone.')){localStorage.removeItem(CFG.ns+'s');localStorage.removeItem(CFG.ns+'key');localStorage.removeItem(CFG.ns+'keys');location.reload()}};
+$('#wk').onclick=()=>setTimeout(()=>$('#gs').click(),50);
+addEventListener('keydown',e=>{const k=e.ctrlKey||e.metaKey;if(k&&e.key==='s'){e.preventDefault();saveEd()}else if(k&&e.key.toLowerCase()==='p'){e.preventDefault();e.shiftKey?openCm():openPk('open')}else if(k&&e.key.toLowerCase()==='f'&&document.activeElement===$('#code')){e.preventDefault();openFind()}});
+addEventListener('online',stat);addEventListener('offline',stat);addEventListener('unhandledrejection',e=>{if(e.reason&&e.reason.name==='AbortError')e.preventDefault()});
+/* ===== Pro editor: syntax colors, smart typing, snippets, find, format, problems, tools ===== */
+const KWD=/^(?:break|case|catch|class|const|continue|default|delete|do|else|export|extends|finally|for|from|function|if|import|in|instanceof|let|new|of|return|static|super|switch|this|throw|try|typeof|var|void|while|yield|async|await|true|false|null|undefined|def|elif|lambda|None|True|False|self|public|private|int|string|using|namespace)$/;
+const T=(c,s)=>'<i class="t'+c+'">'+s+'</i>',X=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function hlc(x,e){x=X(x);
+ if(e==='css')return x.replace(/(\/\*[\s\S]*?\*\/)|("[^"\n]*"|'[^'\n]*')|(#[\da-fA-F]{3,8}\b|\b\d[\d.]*(?:px|em|rem|%|vh|vw|s|ms|deg)?)|([\w-]+)(?=\s*:)|(@[\w-]+)|([.#][A-Za-z_][\w-]*)|(--[\w-]+)/g,(m,a,b,c,d,f,g)=>a?T(3,m):b?T(2,m):c?T(4,m):d?T(6,m):f?T(1,m):g?T(7,m):T(5,m));
+ return x.replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/|#[^\n]*)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`(?:\\.|[^`\\])*`)|(\b\d[\d.]*\b)|([A-Za-z_$][\w$]*)(?=\()|(\b[A-Za-z_]\w*\b)/g,(m,a,b,c,d)=>a?(a[0]==='#'&&e!=='py'&&e!=='sh'?m:T(3,m)):b?T(2,m):c?T(4,m):d?T(7,m):KWD.test(m)?T(1,m):m)}
+function hlh(x){return X(x).replace(/(&lt;!\-\-[\s\S]*?\-\->)|(&lt;!DOCTYPE[^>]*>)|(&lt;\/?[\w:-]+)([^>]*?)(\/?>)/gi,(m,c,d,t,a,z)=>c?T(3,m):d?T(1,m):T(5,t)+a.replace(/([\w:@.-]+)(=("[^"]*"|'[^']*'))?/g,(q,n,eq,v)=>T(6,n)+(eq?'='+T(2,v):''))+T(5,z))}
+function hlAll(code,e){if(code.length>150000)return X(code);
+ if(/^(html?|vue|xml|svg)$/.test(e)){let o='',i=0,m;const re=/(<(script|style)\b[^>]*>)([\s\S]*?)(<\/\2>)/gi;while(m=re.exec(code)){o+=hlh(code.slice(i,m.index)+m[1])+hlc(m[3],m[2].toLowerCase()==='style'?'css':'js')+hlh(m[4]);i=re.lastIndex}return o+hlh(code.slice(i))}
+ return /^(css|scss|less)$/.test(e)?hlc(code,'css'):/^(js|jsx|ts|tsx|json|py|java|cpp|c|sh|sql|php|go|rs)$/.test(e)?hlc(code,e):X(code)}
+function paint(){$('#hl').innerHTML=hlAll($('#code').value,ext(S.open||''))+'\n ';sync()}
+function sync(){const c=$('#code');$('#ln').scrollTop=$('#hl').scrollTop=c.scrollTop;$('#hl').scrollLeft=c.scrollLeft}
+const SN={html:{html:['HTML5 page','<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>$0</title>\n  <style>\n    * { box-sizing: border-box; margin: 0; }\n    body { font-family: system-ui, sans-serif; }\n  </style>\n</head>\n<body>\n\n  <script>\n  <\/script>\n</body>\n</html>\n'],
+ nav:['Navbar','<nav class="nav">\n  <a href="#" class="logo">$0</a>\n  <ul>\n    <li><a href="#home">Home</a></li>\n    <li><a href="#about">About</a></li>\n    <li><a href="#contact">Contact</a></li>\n  </ul>\n</nav>'],
+ form:['Contact form','<form id="form">\n  <input type="text" name="name" placeholder="Name" required>\n  <input type="email" name="email" placeholder="Email" required>\n  <textarea name="msg" placeholder="Message">$0</textarea>\n  <button type="submit">Send</button>\n</form>'],
+ card:['Card','<div class="card">\n  <img src="$0" alt="">\n  <h3>Title</h3>\n  <p>Text</p>\n</div>'],
+ table:['Table','<table>\n  <thead><tr><th>$0</th><th></th></tr></thead>\n  <tbody>\n    <tr><td></td><td></td></tr>\n  </tbody>\n</table>'],
+ ul:['List','<ul>\n  <li>$0</li>\n  <li></li>\n</ul>'],link:['CSS link','<link rel="stylesheet" href="$0">'],script:['Script tag','<script src="$0"><\/script>']},
+css:{flex:['Flex center','display: flex;\njustify-content: center;\nalign-items: center;$0'],grid:['Responsive grid','display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(240px, 1fr));\ngap: 1rem;$0'],media:['Media query','@media (max-width: 768px) {\n  $0\n}'],anim:['Fade-in animation','@keyframes fade {\n  from { opacity: 0; transform: translateY(12px); }\n  to { opacity: 1; transform: none; }\n}\n.$0 { animation: fade .6s ease both; }'],reset:['Reset','* { box-sizing: border-box; margin: 0; padding: 0; }\nbody { font-family: system-ui, sans-serif; line-height: 1.5; }'],vars:['CSS variables',':root {\n  --primary: #6d8cff;\n  --bg: #0b0d12;$0\n}']},
+js:{fn:['Function','function $0() {\n  \n}'],afn:['Async function','async function $0() {\n  \n}'],fetch:['Fetch JSON','const res = await fetch("$0");\nconst data = await res.json();'],evt:['Click listener','document.querySelector("$0").addEventListener("click", () => {\n  \n});'],for:['For loop','for (let i = 0; i < $0; i++) {\n  \n}'],class:['Class','class $0 {\n  constructor() {\n    \n  }\n}'],log:['console.log','console.log($0);'],try:['Try/catch','try {\n  $0\n} catch (err) {\n  console.error(err);\n}']},
+py:{def:['Function','def $0():\n    pass'],main:['Main','def main():\n    $0\n\n\nif __name__ == "__main__":\n    main()'],class:['Class','class $0:\n    def __init__(self):\n        pass'],for:['For loop','for i in range($0):\n    pass']}};
+SN.html['!']=SN.html.html;SN.htm=SN.vue=SN.html;SN.jsx=SN.ts=SN.tsx=SN.js;SN.scss=SN.css;
+const tpl=n=>{const e=ext(n);return /^html?$/.test(e)?SN.html.html[1].replace('$0','My Page'):e==='css'?SN.css.reset[1]+'\n':e==='js'?'"use strict";\n\n':e==='py'?SN.py.main[1].replace('$0','pass')+'\n':e==='json'?'{\n  \n}\n':''};
+const PAIR={'(':')','[':']','{':'}','"':'"',"'":"'",'`':'`'},VOID=/^(br|hr|img|input|meta|link|area|base|col|embed|source|track|wbr)$/i;
+function smart(e){const t=$('#code'),p=t.selectionStart,v=t.value,d=e.data,ty=e.inputType,x=ext(S.open||'');if(p!==t.selectionEnd||/^(md|txt|)$/.test(x))return;
+ if(ty==='insertLineBreak'||(ty==='insertText'&&d==='\n')){const pl=v.slice(0,p-1).split('\n').pop(),ind=pl.match(/^\s*/)[0],tg=pl.match(/<([A-Za-z][\w:-]*)[^<>]*>\s*$/),more=/[{(\[]\s*$/.test(pl)||(x==='py'&&/:\s*$/.test(pl))||(tg&&!VOID.test(tg[1])&&!/\/>\s*$/.test(pl));
+  if(/[{(\[]\s*$/.test(pl)&&'}])'.includes(v[p]||'#')){t.setRangeText(ind+'  \n'+ind,p,p,'start');t.setSelectionRange(p+ind.length+2,p+ind.length+2)}else t.setRangeText(ind+(more?'  ':''),p,p,'end');return}
+ if(!d||d.length!==1)return;const n=v[p]||'',pv=v[p-2]||'';
+ if(')]}"\'`'.includes(d)&&n===d){t.setRangeText('',p,p+1,'start');return}
+ if(PAIR[d]&&('([{'.includes(d)||!/\w/.test(pv))&&!/\w/.test(n||' ')){t.setRangeText(PAIR[d],p,p,'start');return}
+ if(d==='>'&&/^(html?|vue|xml|svg|jsx|tsx)$/.test(x)){const m=v.slice(0,p).match(/<([A-Za-z][\w:-]*)(?:\s[^<>]*)?>$/);if(m&&!VOID.test(m[1])&&v[p-2]!=='/'&&!v.slice(p).startsWith('</'+m[1]))t.setRangeText('</'+m[1]+'>',p,p,'start')}}
+const wordAt=t=>(t.value.slice(0,t.selectionStart).match(/[\w!$-]*$/)||[''])[0];
+function suggest(){const t=$('#code'),b=$('#sg');if(!S.open||t.selectionStart!==t.selectionEnd){b.innerHTML='';return}
+ const w=wordAt(t),sn=SN[ext(S.open)]||{};if(w.length<2&&w!=='!'){b.innerHTML='';return}
+ const a=Object.keys(sn).filter(k=>k.startsWith(w.toLowerCase())).map(k=>'<button data-s="'+esc(k)+'">✨ '+esc(k)+' · '+esc(sn[k][0])+'</button>'),
+ ws=[...new Set(t.value.match(/[A-Za-z_$][\w$-]{3,}/g)||[])].filter(y=>y!==w&&y.startsWith(w)).slice(0,6).map(y=>'<button data-w="'+esc(y)+'">'+esc(y)+'</button>');b.innerHTML=a.concat(ws).join('')}
+$('#sg').onclick=e=>{const x=e.target.closest('button');if(!x)return;const t=$('#code'),p=t.selectionStart,s=p-wordAt(t).length;
+ if(x.dataset.s){const ind=t.value.slice(0,s).split('\n').pop().match(/^\s*/)[0],b=SN[ext(S.open)][x.dataset.s][1].replace(/\n/g,'\n'+ind),i=b.indexOf('$0');t.setRangeText(b.replace('$0',''),s,p,'end');if(i>=0)t.setSelectionRange(s+i,s+i)}else t.setRangeText(x.dataset.w,s,p,'end');t.focus();edUpdate()};
+let lT;function edUpdate(){$('#dot').hidden=!dirty();lnum();$('#sv').textContent=dirty()?'Unsaved changes':'Saved locally';suggest();if(S.set.auto){clearTimeout(aT);aT=setTimeout(()=>{if(dirty())saveEd(1)},1200)}}
+$('#code').oninput=e=>{smart(e);edUpdate()};$('#code').addEventListener('keyup',suggest);$('#code').onscroll=sync;
+$('#code').addEventListener('keydown',e=>{if(e.key==='Tab'&&!e.ctrlKey&&!e.altKey){e.preventDefault();if(!document.execCommand('insertText',false,'  ')){const t=e.target;t.setRangeText('  ',t.selectionStart,t.selectionEnd,'end')}edUpdate()}});
+function setText(s){const t=$('#code');t.focus();t.select();if(!document.execCommand('insertText',false,s))t.value=s;edUpdate()}
+function beautify(c,e){if(e==='json'){try{return JSON.stringify(JSON.parse(c),null,2)+'\n'}catch(x){throw Error('Invalid JSON: '+x.message)}}
+ const H=/^(html?|vue|xml|svg)$/.test(e);let d=0,m=0;const o=[];
+ for(const l of c.replace(/\r/g,'').split('\n')){const s=l.trim();if(!s){o.push('');continue}let a=0,b=0;
+  if(H&&!m){const t=s.replace(/<!\-\-.*?\-\->/g,'');a=(t.match(/<([A-Za-z][\w:-]*)\b(?:"[^"]*"|'[^']*'|[^>"'])*?>/g)||[]).filter(y=>!VOID.test(y.slice(1).match(/^[\w:-]+/)[0])&&!/\/>$/.test(y)).length;b=(t.match(/<\/[\w:-]+\s*>/g)||[]).length;if(/^<(script|style)\b/i.test(s)&&!/<\/(script|style)>/i.test(s))m=1}
+  else{const t=s.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,'').replace(/\/\*.*?\*\//g,'').replace(/\/\/.*$/,'');a=(t.match(/[{(\[]/g)||[]).length;b=(t.match(/[})\]]/g)||[]).length;if(H&&/^<\/(script|style)>/i.test(s)){m=0;a=0;b=1}}
+  const lead=/^(<\/|[})\]])/.test(s)?1:0;o.push('  '.repeat(Math.max(0,d-lead))+s);d=Math.max(0,d+a-b)}
+ return o.join('\n')}
+function doFmt(){if(!getF(S.open))return toast('Open a file first.');try{const n=beautify($('#code').value,ext(S.open));if(n===$('#code').value)return toast('Already formatted.');setText(n);toast('Formatted. Ctrl+Z undoes it.','ok')}catch(e){toast(e.message,'err')}}
+function lint(c,e){const P=[],H=/^(html?|vue|xml|svg)$/.test(e),B=s=>s.replace(/[^\n]/g,' ');
+ if(e==='json'){try{JSON.parse(c)}catch(x){P.push(x.message)}return P}
+ if(H){c=c.replace(/(<(script|style)\b[^>]*>)([\s\S]*?)(<\/\2>)/gi,(m,a,t,b,z)=>a+B(b)+z).replace(/<!\-\-[\s\S]*?\-\->/g,B);const st=[],re=/<(\/?)([A-Za-z][\w:-]*)((?:"[^"]*"|'[^']*'|[^>"'])*?)(\/?)>/g;let m;
+  while(m=re.exec(c)){const n=m[2].toLowerCase(),l=c.slice(0,m.index).split('\n').length;
+   if(m[1]){const i=st.map(y=>y.n).lastIndexOf(n);if(i<0)P.push('Line '+l+': stray </'+n+'>');else{st.slice(i+1).forEach(y=>P.push('Line '+y.l+': <'+y.n+'> is not closed'));st.length=i}}else if(!VOID.test(n)&&!m[4])st.push({n,l})}
+  st.forEach(y=>P.push('Line '+y.l+': <'+y.n+'> is not closed'));return P}
+ if(/^(css|scss|js|jsx|ts|tsx|java|cpp|c|php|go|rs)$/.test(e)){const M={'{':'}','(':')','[':']'},o=[];
+  c.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`(?:\\.|[^`\\])*`/g,B).split('\n').forEach((ln,i)=>{for(const ch of ln){if(M[ch])o.push([ch,i+1]);else if('})]'.includes(ch)){const q=o.pop();if(!q)P.push('Line '+(i+1)+': extra '+ch);else if(M[q[0]]!==ch)P.push('Line '+(i+1)+': expected '+M[q[0]]+' to close line '+q[1])}}});
+  o.forEach(q=>P.push('Line '+q[1]+': '+q[0]+' is never closed'))}
+ return P.slice(0,20)}
+let PR=[];function probs(){const f=getF(S.open);PR=f?lint($('#code').value,ext(S.open)):[];$('#pb').textContent=!f?'':PR.length?'⚠ '+PR.length+' problem'+(PR.length>1?'s':''):'✓ No problems';$('#pb').className=PR.length?'err':'ok'}
+$('#pb').onclick=()=>PR.length&&toast(PR.slice(0,6).join('\n'),'err');
+function openFind(){$('#fb').hidden=false;const t=$('#code'),s=t.value.slice(t.selectionStart,t.selectionEnd);if(s&&!s.includes('\n'))$('#fi').value=s;$('#fi').focus()}
+const rx=q=>new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+function findN(dir){const t=$('#code'),q=$('#fi').value;if(!q)return;const v=t.value,ms=[...v.matchAll(rx(q))];if(!ms.length)return toast('No matches.');
+ const c=dir>0?t.selectionEnd:t.selectionStart-1;let m=dir>0?ms.find(y=>y.index>=c):[...ms].reverse().find(y=>y.index<c);m=m||(dir>0?ms[0]:ms[ms.length-1]);
+ t.focus();t.setSelectionRange(m.index,m.index+m[0].length);t.scrollTop=Math.max(0,(v.slice(0,m.index).split('\n').length-4)*S.set.fs*1.5);sync()}
+$('#fn1').onclick=()=>findN(1);$('#fp1').onclick=()=>findN(-1);$('#fx').onclick=()=>$('#fb').hidden=true;$('#fd').onclick=openFind;$('#ft').onclick=doFmt;
+$('#fi').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();findN(e.shiftKey?-1:1)}};
+$('#fr1').onclick=()=>{const t=$('#code'),q=$('#fi').value,s=t.value.slice(t.selectionStart,t.selectionEnd);if(q&&s.toLowerCase()===q.toLowerCase()){t.setRangeText($('#fr').value,t.selectionStart,t.selectionEnd,'end');edUpdate()}findN(1)};
+$('#fra').onclick=()=>{const q=$('#fi').value,v=$('#code').value,n=q?(v.match(rx(q))||[]).length:0;if(!n)return toast('No matches.');setText(v.replace(rx(q),()=>$('#fr').value));toast(n+' replaced.','ok')};
+const AIQ=[['Explain this code','Explain this code step by step.'],['Find and fix bugs','Find and fix all bugs and errors in this code.'],['Add comments','Add clear comments without changing behavior.'],['Make it responsive','Make this fully responsive for mobile, tablet and desktop.'],['Optimize','Refactor and optimize this code, keeping the same behavior.'],['Add dark mode','Add a working dark mode toggle.']];
+function askAI(q){const t=$('#code'),s=t.value.slice(t.selectionStart,t.selectionEnd);$('#in').value=q+(s?'\n\nSelected code in '+S.open+':\n'+FN+'\n'+s+'\n'+FN:S.open?' (file: '+S.open+')':'');pane('chat');$('#in').focus();ctxUI()}
+function goLine(){const n=+prompt('Go to line number:');if(!(n>0))return;const t=$('#code'),L=t.value.split('\n');let p=0;for(let i=0;i<Math.min(n-1,L.length-1);i++)p+=L[i].length+1;t.focus();t.setSelectionRange(p,p);t.scrollTop=Math.max(0,(n-4)*S.set.fs*1.5);sync()}
+const CMDS=[['🔎 Find & replace (Ctrl+F)',openFind],['↴ Go to line',goLine],['✨ Format document',doFmt],['⚠ Check problems',()=>toast(PR.length?PR.slice(0,6).join('\n'):'No problems found.',PR.length?'err':'ok')],['↩ Toggle word wrap',()=>{S.set.wrap=!S.set.wrap;prefs();save()}],['＋ New file (with template)',newFile],['⟲ Restore older version',restoreV],...AIQ.map(a=>['🤖 AI: '+a[0],()=>askAI(a[1])])];
+function cmList(){const q=$('#cmq').value.toLowerCase();$('#cml').innerHTML=CMDS.map((c,i)=>c[0].toLowerCase().includes(q)?'<li><button data-i="'+i+'" style="width:100%;text-align:left">'+esc(c[0])+'</button></li>':'').join('')}
+function openCm(){$('#cmq').value='';cmList();$('#cm').showModal();$('#cmq').focus()}
+$('#cmq').oninput=cmList;$('#cml').onclick=e=>{const b=e.target.closest('button');if(b){$('#cm').close();CMDS[+b.dataset.i][1]()}};$('#tl').onclick=openCm;
+const CON='<script>(function(){var s=function(m){parent.postMessage({fc:m},"*")};["log","warn","error"].forEach(function(k){var o=console[k];console[k]=function(){var a=[].slice.call(arguments).map(function(x){try{return typeof x==="object"?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(" ");s(k+": "+a);o.apply(console,arguments)}});addEventListener("error",function(e){s("error: "+e.message+" (line "+e.lineno+")")})})()<\/script>';
+const injC=h=>/<head[^>]*>/i.test(h)?h.replace(/<head[^>]*>/i,m=>m+CON):CON+h;
+addEventListener('message',e=>{if(e.source===$('#pv iframe').contentWindow&&e.data&&typeof e.data.fc==='string'){const o=$('#pvc');o.textContent+=e.data.fc+'\n';o.scrollTop=1e9}});
+/* ===== Initialization ===== */
+if(first){S.files=[{n:'index.html',c:'<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>Hello</title>\n<link rel="stylesheet" href="style.css">\n</head>\n<body>\n<h1>Hello, Forge</h1>\n<button id="b">Click me</button>\n<script src="app.js"><\/script>\n</body>\n</html>\n',m:Date.now()},{n:'style.css',c:'body{font-family:system-ui;margin:2rem}\nbutton{padding:.6rem 1rem}\n',m:Date.now()},{n:'app.js',c:'document.getElementById("b").onclick=()=>alert("Hello!");\n',m:Date.now()}];
+ S.chats=[{id:uid(),t:'Getting started',msgs:[{r:'ai',ts:Date.now(),x:'Welcome to **'+CFG.name+'**. Type `/file`, pick `index.html` and `style.css`, then ask: "make the button look modern". Every AI edit appears as a diff you can apply, reject or undo. Type `/help` for commands.'}]}];S.cur=S.chats[0].id;S.open='index.html'}
+if(!S.chats.length)newChat();if(!cur())S.cur=S.chats[0].id;
+$('#prov').innerHTML=Object.keys(PROV).map(k=>'<option value="'+k+'">'+PROV[k].n+'</option>').join('');fillModels(PROV[S.set.prov].models);renderAll();pane('chat');loadModels();if(NATIVE())setTimeout(perm,800);if(first){save();$('#wel').showModal()}
+</script>
+</body></html>
